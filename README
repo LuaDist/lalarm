@@ -1,0 +1,5 @@
+This is an alarm library for Lua. It depends on signal and SIGALRM.
+It works with Lua 5.0w0 but with small changes perhaps also in Lua 4.0.
+
+This is work in progress.
+Please send comments, suggestions, and bug reports to lhf@tecgraf.puc-rio.br .
