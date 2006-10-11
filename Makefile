@@ -1,57 +1,57 @@
-# makefile for lalarm
+# makefile for alarm library for Lua
 
-# change this to reflect your installation
-LUA=/tmp/lua-4.0
+# change these to reflect your Lua installation
+LUA= /tmp/lhf/lua-5.0
 LUAINC= $(LUA)/include
 LUALIB= $(LUA)/lib
 LUABIN= $(LUA)/bin
-LUA_C= $(LUA)/src/lua/lua.c
 
-# change this to reflect your installation
-LUA=/l/lua
-LUAINC= /l/lua
-LUALIB= /l/lua
-LUABIN= /l/lua
-LUA_C= /l/lua/lua.c
+# no need to change anything below here
+CFLAGS= $(INCS) $(WARN) -O2 $G
+WARN= -pedantic -Wall
+INCS= -I$(LUAINC)
 
-# not need to change anything below here
-
-CFLAGS= $(INCS) $(DEFS) $(WARN) -O2 #-g
-WARN= -ansi -pedantic -Wall #-Wmissing-prototypes
-
-INCS= -I$(LUAINC) -I.
-LIBS= -L$(LUALIB) -llua -llualib -lm -ldl
-
-OBJS= lua.o lalarm.o
-
-T=a.out
+MYNAME= alarm
+MYLIB= l$(MYNAME)
+T= $(MYLIB).so
+OBJS= $(MYLIB).o
+TEST= test.lua
 
 all:	test
 
-$T:	$(OBJS)
-	$(CC) -o $@ $(OBJS) $(LIBS)
-
 test:	$T
-	$T test.lua
+	$(LUABIN)/lua -l$(MYNAME) $(TEST)
 
-lua.c:	$(LUA_C)
-	sed '/dblib/s/$$/ lua_lalarmopen(L);/' <$? >$@
+o:	$(MYLIB).o
+
+so:	$T
+
+$T:	$(OBJS)
+	$(CC) -o $@ -shared $(OBJS)
 
 clean:
-	rm -f $(OBJS) $T lua.c core a.out
+	rm -f $(OBJS) $T core core.* a.out
+
+doc:
+	@echo "$(MYNAME) library:"
+	@fgrep '/**' $(MYLIB).c | cut -f2 -d/ | tr -d '*' | sort | column
 
 # distribution
 
-D=alarm
-A=$D.tar.gz
-TOTAR=Makefile,README,lalarm.c,test.lua
+FTP= $(HOME)/public/ftp/lua/5.0
+D= $(MYNAME)
+A= $(MYLIB).tar.gz
+TOTAR= Makefile,README,$(MYLIB).c,$(MYNAME).lua,test.lua
 
 tar:	clean
 	tar zcvf $A -C .. $D/{$(TOTAR)}
 
 distr:	tar
-	mv $A ftp
+	touch -r $A .stamp
+	mv $A $(FTP)
 
-diff:
-	tar zxf ftp/$A
-	diff . $D
+diff:	clean
+	tar zxf $(FTP)/$A
+	diff $D .
+
+# eof

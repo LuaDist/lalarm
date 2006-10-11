@@ -1,45 +1,55 @@
 /*
-* lalarm.c -- an alarm library for Lua
+* lalarm.c
+* an alarm library for Lua 5.0 based on signal
+* Luiz Henrique de Figueiredo <lhf@tecgraf.puc-rio.br>
+* 11 Oct 2006 12:39:59
+* This code is hereby placed in the public domain.
 */
 
 #include <signal.h>
 #include <unistd.h>
 
 #include "lua.h"
-#include "luadebug.h"
+#include "lauxlib.h"
 
-#define NAME	"_ALARM"
+#define NAME	"alarm handler"
 
-static lua_State *LL = NULL;
-static lua_Hook linehook = NULL;
-static lua_Hook callhook = NULL;
+static lua_State *LL=NULL;
+static lua_Hook oldhook=NULL;
+static int oldmask=0;
+static int oldcount=0;
 
 static void l_handler(lua_State *L, lua_Debug *ar)
 {
  L=LL;
- lua_setlinehook(L,linehook);
- lua_setcallhook(L,callhook);
- lua_pushstring(L,NAME);
+ lua_sethook(L,oldhook,oldmask,oldcount);
+ lua_pushliteral(L,NAME);
  lua_gettable(L,LUA_REGISTRYINDEX);
- if (lua_isfunction(L,-1))
-  lua_call(L,0,0);
- else
-  lua_error(L,"bad alarm handler");
+ lua_call(L,0,0);
 }
 
 static void l_signal(int i)
 {						/* assert(i==SIGALRM); */
  signal(i,SIG_DFL);
- linehook = lua_setlinehook(LL,l_handler);
- callhook = lua_setcallhook(LL,l_handler);
+ oldhook=lua_gethook(LL);
+ oldmask=lua_gethookmask(LL);
+ oldcount=lua_gethookcount(LL);
+ lua_sethook(LL,l_handler,LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT,1);
 }
 
-static int l_alarm(lua_State *L) 		/* alarm(secs,[func]) */
+static int l_alarm(lua_State *L) 		/** alarm(secs,[func]) */
 {
  LL=L;
- if (lua_gettop(L)>1)
+ if (lua_gettop(L)==1)
  {
-  lua_pushstring(L,NAME);
+  lua_pushliteral(L,NAME);
+  lua_gettable(L,LUA_REGISTRYINDEX);
+  if (lua_isnil(L,-1)) luaL_error(L,"no alarm handler set");
+ }
+ else
+ {
+  luaL_checktype(L,2,LUA_TFUNCTION);
+  lua_pushliteral(L,NAME);
   lua_pushvalue(L,2);
   lua_settable(L,LUA_REGISTRYINDEX);
  }
@@ -50,7 +60,7 @@ static int l_alarm(lua_State *L) 		/* alarm(secs,[func]) */
  return 1;
 }
 
-int lua_lalarmopen(lua_State *L)
+LUALIB_API int luaopen_alarm(lua_State *L)
 {
  lua_register(L,"alarm",l_alarm);
  return 0;

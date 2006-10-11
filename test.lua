@@ -1,27 +1,18 @@
-if os~=nil then
- date = os.date
- floor = math.floor
- sin = math.sin
-end
+-- test alarm
 
 function myalarm()
- print("in alarm!",date"%T",a,floor(100*a/N).."%")
+ print("in alarm!",os.date"%T",a,math.floor(100*a/N).."%")
  alarm(1)
 end
 
-N=1000000
-N=2000000
-N=3000000
 N=4000000
 
 print"hello"
-a=0
 alarm(1,myalarm)
+a=0
 for i=1,N do
  a=a+1
---[[
- sin(a)
---]]
+ math.sin(a)	-- waste some time...
 end
 print(a)
 print"bye"
