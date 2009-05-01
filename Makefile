@@ -1,36 +1,45 @@
 # makefile for alarm library for Lua
 
 # change these to reflect your Lua installation
-LUA= /tmp/lhf/lua-5.0
-LUAINC= $(LUA)/include
-LUALIB= $(LUA)/lib
-LUABIN= $(LUA)/bin
+LUA= /tmp/lhf/lua-5.1.4
+LUAINC= $(LUA)/src
+LUALIB= $(LUA)/src
+LUABIN= $(LUA)/src
 
-# no need to change anything below here
+# these will probably work if Lua has been installed globally
+#LUA= /usr/local
+#LUAINC= $(LUA)/include
+#LUALIB= $(LUA)/lib
+#LUABIN= $(LUA)/bin
+
+# probably no need to change anything below here
+CC= gcc
 CFLAGS= $(INCS) $(WARN) -O2 $G
 WARN= -pedantic -Wall
 INCS= -I$(LUAINC)
+MAKESO= $(CC) -shared
+#MAKESO= env MACOSX_DEPLOYMENT_TARGET=10.3 $(CC) -bundle -undefined dynamic_lookup
 
 MYNAME= alarm
 MYLIB= l$(MYNAME)
-T= $(MYLIB).so
+T= $(MYNAME).so
 OBJS= $(MYLIB).o
 TEST= test.lua
 
 all:	test
 
 test:	$T
-	$(LUABIN)/lua -l$(MYNAME) $(TEST)
+	$(LUABIN)/lua $(TEST)
 
 o:	$(MYLIB).o
 
 so:	$T
 
 $T:	$(OBJS)
-	$(CC) -o $@ -shared $(OBJS)
+	$(MAKESO) -o $@ $(OBJS)
 
 clean:
-	rm -f $(OBJS) $T core core.* a.out
+	rm -f $(OBJS) $T core core.*
 
 doc:
 	@echo "$(MYNAME) library:"
@@ -38,15 +47,13 @@ doc:
 
 # distribution
 
-FTP= $(HOME)/public/ftp/lua/5.0
+FTP= $(HOME)/public/ftp/lua/5.1
 D= $(MYNAME)
 A= $(MYLIB).tar.gz
-TOTAR= Makefile,README,$(MYLIB).c,$(MYNAME).lua,test.lua
+TOTAR= Makefile,README,$(MYLIB).c,test.lua
 
-tar:	clean
+distr:	clean
 	tar zcvf $A -C .. $D/{$(TOTAR)}
-
-distr:	tar
 	touch -r $A .stamp
 	mv $A $(FTP)
 

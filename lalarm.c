@@ -1,8 +1,8 @@
 /*
 * lalarm.c
-* an alarm library for Lua 5.0 based on signal
+* an alarm library for Lua 5.1 based on signal
 * Luiz Henrique de Figueiredo <lhf@tecgraf.puc-rio.br>
-* 11 Oct 2006 12:39:59
+* 01 May 2009 10:40:56
 * This code is hereby placed in the public domain.
 */
 
@@ -37,26 +37,29 @@ static void l_signal(int i)
  lua_sethook(LL,l_handler,LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT,1);
 }
 
-static int l_alarm(lua_State *L) 		/** alarm(secs,[func]) */
+static int l_alarm(lua_State *L) 		/** alarm([secs,[func]]) */
 {
  LL=L;
- if (lua_gettop(L)==1)
+ switch (lua_gettop(L))
  {
-  lua_pushliteral(L,NAME);
-  lua_gettable(L,LUA_REGISTRYINDEX);
-  if (lua_isnil(L,-1)) luaL_error(L,"no alarm handler set");
- }
- else
- {
-  luaL_checktype(L,2,LUA_TFUNCTION);
-  lua_pushliteral(L,NAME);
-  lua_pushvalue(L,2);
-  lua_settable(L,LUA_REGISTRYINDEX);
+  case 0:
+	break;
+  case 1:
+	lua_pushliteral(L,NAME);
+	lua_gettable(L,LUA_REGISTRYINDEX);
+	if (lua_isnil(L,-1)) luaL_error(L,"no alarm handler set");
+	break;
+  default:
+	luaL_checktype(L,2,LUA_TFUNCTION);
+	lua_pushliteral(L,NAME);
+	lua_pushvalue(L,2);
+	lua_settable(L,LUA_REGISTRYINDEX);
+	break;
  }
  if (signal(SIGALRM,l_signal)==SIG_ERR)
   lua_pushnil(L);
  else
-  lua_pushnumber(L,alarm(lua_tonumber(L,1)));
+  lua_pushinteger(L,alarm(luaL_optinteger(L,1,0)));
  return 1;
 }
 
