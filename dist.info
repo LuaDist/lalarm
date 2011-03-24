@@ -1,0 +1,14 @@
+--- This file is part of LuaDist project
+
+name = "lalarm"
+version = "5.1"
+
+desc = "An alarm library for Lua based on POSIX alarm."
+author = "Luiz Henrique de Figueiredo"
+license = "public domain"
+url = "http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lalarm"
+maintainer = "Peter Drahoš"
+
+depends = {
+	"lua ~> 5.1"
+}
