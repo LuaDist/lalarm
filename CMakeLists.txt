@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2011 LuaDist.
+# Copyright (C) 2007-2012 LuaDist.
 # Submitted by David Manura
 # Redistribution and use of this file is allowed according to the terms of the MIT license.
 # For details see the COPYRIGHT file distributed with LuaDist.
@@ -6,12 +6,11 @@
 
 project ( lalarm C )
 cmake_minimum_required ( VERSION 2.6 )
-include ( dist.cmake )
+include ( cmake/dist.cmake )
+include ( lua )
 
 install_lua_module ( alarm lalarm.c )
 install_test ( test.lua )
 install_data ( README )
 
 add_lua_test ( test.lua )
-
-
