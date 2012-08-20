@@ -5,7 +5,7 @@
 # Please note that the package source code is licensed under its own license.b
 
 project ( lalarm C )
-cmake_minimum_required ( VERSION 2.6 )
+cmake_minimum_required ( VERSION 2.8 )
 include ( cmake/dist.cmake )
 include ( lua )
 
