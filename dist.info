@@ -1,0 +1,28 @@
+type = "x86_64"
+arch = "Ubuntu"
+author = "Luiz Henrique de Figueiredo"
+depends = {
+[[lua ~> 5.1]],
+}
+
+desc = "An alarm library for Lua based on POSIX alarm."
+version = "5.1"
+maintainer = "Peter Drahoš"
+files = {
+Runtime = {
+[[lib/lua/alarm.so]],
+}
+,
+Data = {
+[[share/lalarm/README]],
+}
+,
+Test = {
+[[share/lalarm/test/test.lua]],
+}
+,
+}
+
+license = "public domain"
+name = "lalarm"
+url = "http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lalarm"
